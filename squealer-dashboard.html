@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Squealer – Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --g1:#0d4425;--g2:#1a6b3a;--g3:#2d8a52;--g4:#3fab68;--g5:#8ed4aa;
+  --gl:#eaf5ef;--gxl:#f5fbf7;
+  --ink:#0c1e12;--ink2:#3d5444;--ink3:#849e8b;
+  --white:#fff;--bg:#f4f7f5;
+  --sidebar:220px;
+  --err:#c0392b;
+}
+body{font-family:'Inter',sans-serif;color:var(--ink);background:var(--bg);display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);background:var(--g1);display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;z-index:100;padding:0 0 24px;}
+.sidebar-logo{display:flex;align-items:center;gap:10px;padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.07);text-decoration:none;}
+.logomark{width:28px;height:28px;background:linear-gradient(135deg,rgba(255,255,255,.2),rgba(255,255,255,.08));border-radius:7px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.12);}
+.logomark svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;}
+.logotype{font-size:1.05rem;font-weight:800;color:#fff;letter-spacing:-.3px;}
+.sidebar-section{padding:20px 12px 8px;font-size:.67rem;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.1em;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;margin:1px 8px;cursor:pointer;transition:.15s;text-decoration:none;}
+.nav-item svg{width:17px;height:17px;stroke:rgba(255,255,255,.5);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.nav-item span{font-size:.875rem;font-weight:500;color:rgba(255,255,255,.6);}
+.nav-item:hover{background:rgba(255,255,255,.07);}
+.nav-item:hover svg,.nav-item:hover span{stroke:rgba(255,255,255,.85);color:rgba(255,255,255,.85);}
+.nav-item.active{background:rgba(255,255,255,.12);}
+.nav-item.active svg{stroke:#fff;}
+.nav-item.active span{color:#fff;font-weight:600;}
+.sidebar-bottom{margin-top:auto;padding:0 8px;}
+.user-chip{display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.07);}
+.user-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--g3),var(--g5));display:grid;place-items:center;font-size:.78rem;font-weight:700;color:#fff;flex-shrink:0;}
+.user-info{flex:1;min-width:0;}
+.user-name{font-size:.82rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.user-plan{font-size:.7rem;color:rgba(255,255,255,.4);}
+.user-chip .sign-out{color:rgba(255,255,255,.35);cursor:pointer;transition:.15s;}
+.user-chip .sign-out:hover{color:rgba(255,255,255,.7);}
+.user-chip .sign-out svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* MAIN */
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:var(--white);border-bottom:1px solid rgba(45,138,82,.08);padding:0 36px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-title{font-size:1.05rem;font-weight:700;color:var(--ink);}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.usage-pill{background:var(--gl);border:1px solid rgba(45,138,82,.15);border-radius:100px;padding:5px 14px;font-size:.78rem;font-weight:600;color:var(--g2);}
+.page-content{padding:32px 36px;flex:1;}
+
+/* PAGES */
+.dash-page{display:none;}
+.dash-page.active{display:block;}
+
+/* STAT CARDS */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+.stat-card{background:var(--white);border-radius:14px;padding:22px;border:1px solid rgba(45,138,82,.08);box-shadow:0 2px 12px rgba(0,0,0,.04);}
+.stat-label{font-size:.72rem;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.stat-val{font-size:1.9rem;font-weight:800;color:var(--ink);letter-spacing:-.5px;line-height:1;}
+.stat-sub{font-size:.75rem;color:var(--g3);font-weight:600;margin-top:5px;}
+.stat-sub.warn{color:#e67e22;}
+
+/* UPLOAD ZONE */
+.upload-section{background:var(--white);border-radius:16px;border:1px solid rgba(45,138,82,.08);overflow:hidden;margin-bottom:28px;box-shadow:0 2px 12px rgba(0,0,0,.04);}
+.upload-section-header{padding:20px 24px;border-bottom:1px solid rgba(45,138,82,.06);display:flex;justify-content:space-between;align-items:center;}
+.upload-section-header h3{font-size:.95rem;font-weight:700;color:var(--ink);}
+.free-note{font-size:.78rem;color:var(--ink3);}
+.free-note strong{color:var(--g2);}
+.drop-zone{margin:24px;border:2px dashed rgba(45,138,82,.25);border-radius:14px;padding:48px 24px;text-align:center;cursor:pointer;transition:.2s;background:var(--gxl);}
+.drop-zone:hover,.drop-zone.dragover{border-color:var(--g3);background:var(--gl);}
+.drop-icon{width:52px;height:52px;background:var(--gl);border-radius:14px;display:grid;place-items:center;margin:0 auto 16px;}
+.drop-icon svg{width:26px;height:26px;stroke:var(--g2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.drop-zone h4{font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:6px;}
+.drop-zone p{font-size:.84rem;color:var(--ink3);line-height:1.6;}
+.drop-zone .drop-limit{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid rgba(45,138,82,.15);border-radius:100px;padding:5px 14px;font-size:.75rem;font-weight:600;color:var(--g2);margin-top:14px;}
+.hidden-input{display:none;}
+
+/* PROGRESS */
+.progress-wrap{margin:0 24px 24px;display:none;}
+.progress-file{display:flex;align-items:center;gap:14px;background:var(--gxl);border-radius:12px;padding:16px 18px;border:1px solid rgba(45,138,82,.1);}
+.progress-file-icon{font-size:1.4rem;}
+.progress-info{flex:1;}
+.progress-name{font-size:.88rem;font-weight:600;color:var(--ink);margin-bottom:6px;}
+.progress-bar-wrap{height:5px;background:#d8ead0;border-radius:3px;overflow:hidden;}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--g2),var(--g4));border-radius:3px;transition:width .4s ease;width:0%;}
+.progress-status{font-size:.75rem;color:var(--ink3);margin-top:5px;}
+.progress-cancel{color:var(--ink3);cursor:pointer;font-size:.8rem;text-decoration:underline;}
+
+/* RECENT UPLOADS TABLE */
+.table-card{background:var(--white);border-radius:16px;border:1px solid rgba(45,138,82,.08);overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.04);}
+.table-header{padding:18px 24px;border-bottom:1px solid rgba(45,138,82,.06);display:flex;justify-content:space-between;align-items:center;}
+.table-header h3{font-size:.95rem;font-weight:700;color:var(--ink);}
+table{width:100%;border-collapse:collapse;}
+th{padding:11px 20px;text-align:left;font-size:.72rem;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;background:var(--gxl);border-bottom:1px solid rgba(45,138,82,.06);}
+td{padding:14px 20px;border-bottom:1px solid rgba(45,138,82,.05);font-size:.875rem;color:var(--ink2);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--gxl);}
+.status-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:100px;font-size:.72rem;font-weight:700;}
+.status-badge.complete{background:#e8f5ee;color:#1a6b3a;}
+.status-badge.processing{background:#fff8e1;color:#e67e22;}
+.status-badge.failed{background:#fdf0ee;color:var(--err);}
+.status-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+.tbl-btn{background:var(--gl);border:none;color:var(--g2);font-size:.75rem;font-weight:700;padding:5px 12px;border-radius:7px;cursor:pointer;font-family:inherit;transition:.15s;}
+.tbl-btn:hover{background:var(--g2);color:#fff;}
+
+/* TRANSACTIONS PAGE */
+.filters{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center;}
+.filter-input{padding:9px 14px;border:1.5px solid #d4e4d8;border-radius:9px;font-size:.85rem;font-family:inherit;color:var(--ink);background:#fff;outline:none;transition:.2s;}
+.filter-input:focus{border-color:var(--g3);box-shadow:0 0 0 3px rgba(45,138,82,.1);}
+.filter-input::placeholder{color:var(--ink3);}
+select.filter-input{cursor:pointer;}
+.filter-clear{font-size:.8rem;color:var(--ink3);cursor:pointer;text-decoration:underline;}
+.filter-clear:hover{color:var(--g2);}
+.amount-neg{color:var(--err);font-weight:600;}
+.amount-pos{color:var(--g2);font-weight:600;}
+.pagination{display:flex;align-items:center;gap:8px;padding:16px 20px;border-top:1px solid rgba(45,138,82,.06);}
+.page-btn{width:32px;height:32px;border-radius:8px;border:1.5px solid #d4e4d8;background:#fff;display:grid;place-items:center;cursor:pointer;font-size:.82rem;font-weight:600;color:var(--ink2);transition:.15s;}
+.page-btn:hover,.page-btn.active{background:var(--g2);border-color:var(--g2);color:#fff;}
+.page-btn:disabled{opacity:.4;cursor:not-allowed;}
+.page-info{font-size:.8rem;color:var(--ink3);margin:0 8px;}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 20px;}
+.empty-icon{font-size:2.5rem;margin-bottom:14px;}
+.empty h4{font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:6px;}
+.empty p{font-size:.85rem;color:var(--ink3);line-height:1.6;max-width:280px;margin:0 auto 20px;}
+.btn-sm{padding:9px 20px;border-radius:9px;font-size:.85rem;font-weight:600;cursor:pointer;border:none;font-family:inherit;background:var(--g2);color:#fff;transition:.2s;}
+.btn-sm:hover{background:var(--g1);}
+
+/* BILLING */
+.billing-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px;}
+.billing-card{background:var(--white);border-radius:16px;padding:28px;border:1px solid rgba(45,138,82,.08);box-shadow:0 2px 12px rgba(0,0,0,.04);}
+.billing-card h3{font-size:.85rem;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;}
+.plan-name{font-size:1.3rem;font-weight:800;color:var(--ink);margin-bottom:4px;}
+.plan-price{font-size:.9rem;color:var(--ink3);margin-bottom:16px;}
+.plan-status{display:inline-flex;align-items:center;gap:6px;background:var(--gl);color:var(--g2);border-radius:100px;padding:4px 12px;font-size:.75rem;font-weight:700;border:1px solid rgba(45,138,82,.15);}
+.billing-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
+.btn-outline{padding:9px 20px;border-radius:9px;font-size:.85rem;font-weight:600;cursor:pointer;background:transparent;border:1.5px solid var(--g3);color:var(--g2);font-family:inherit;transition:.2s;}
+.btn-outline:hover{background:var(--gl);}
+.btn-danger{padding:9px 20px;border-radius:9px;font-size:.85rem;font-weight:600;cursor:pointer;background:transparent;border:1.5px solid #e8c5c0;color:var(--err);font-family:inherit;transition:.2s;}
+.btn-danger:hover{background:#fdf0ee;}
+.usage-bar-wrap{height:8px;background:#e8ede9;border-radius:4px;overflow:hidden;margin:10px 0;}
+.usage-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--g2),var(--g4));transition:width .6s ease;}
+.usage-bar.warn{background:linear-gradient(90deg,#e67e22,#f39c12);}
+.invoice-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(45,138,82,.06);font-size:.875rem;}
+.invoice-row:last-child{border-bottom:none;}
+.invoice-row .inv-date{color:var(--ink3);}
+.invoice-row .inv-amt{font-weight:700;color:var(--ink);}
+.invoice-row .inv-dl{color:var(--g3);cursor:pointer;font-size:.78rem;font-weight:600;text-decoration:none;}
+.invoice-row .inv-dl:hover{text-decoration:underline;}
+
+/* ACCOUNT */
+.account-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.account-card{background:var(--white);border-radius:16px;padding:28px;border:1px solid rgba(45,138,82,.08);box-shadow:0 2px 12px rgba(0,0,0,.04);}
+.account-card h3{font-size:.88rem;font-weight:700;color:var(--ink);margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid rgba(45,138,82,.07);}
+.form-group{margin-bottom:16px;}
+.form-group label{display:block;font-size:.75rem;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
+.form-group input{width:100%;padding:10px 13px;border:1.5px solid #d4e4d8;border-radius:9px;font-size:.9rem;font-family:inherit;color:var(--ink);outline:none;transition:.2s;}
+.form-group input:focus{border-color:var(--g3);box-shadow:0 0 0 3px rgba(45,138,82,.1);}
+.save-btn{padding:10px 24px;border-radius:9px;font-size:.875rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;background:var(--g2);color:#fff;transition:.2s;}
+.save-btn:hover{background:var(--g1);}
+.danger-zone{background:#fff9f8;border:1px solid #f5d0cb;border-radius:16px;padding:28px;margin-top:20px;}
+.danger-zone h3{font-size:.88rem;font-weight:700;color:var(--err);margin-bottom:8px;}
+.danger-zone p{font-size:.84rem;color:var(--ink3);line-height:1.6;margin-bottom:16px;}
+.toast{position:fixed;bottom:28px;right:28px;background:var(--ink);color:#fff;padding:12px 20px;border-radius:10px;font-size:.85rem;font-weight:500;z-index:999;opacity:0;transform:translateY(10px);transition:.3s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <a class="sidebar-logo" href="#">
+    <div class="logomark"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+    <span class="logotype">Squealer</span>
+  </a>
+  <div class="sidebar-section">Main</div>
+  <a class="nav-item active" onclick="showPage('upload',this)">
+    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    <span>Upload</span>
+  </a>
+  <a class="nav-item" onclick="showPage('transactions',this)">
+    <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+    <span>Transactions</span>
+  </a>
+  <a class="nav-item" onclick="showPage('visualizations',this)">
+    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span>Visualizations</span>
+  </a>
+  <a class="nav-item" onclick="showPage('exports',this)">
+    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <span>Export</span>
+  </a>
+  <div class="sidebar-section">Learn</div>
+  <a class="nav-item" onclick="showPage('excel',this)">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    <span>Excel Tips</span>
+  </a>
+  <div class="sidebar-section">Account</div>
+  <a class="nav-item" onclick="showPage('billing',this)">
+    <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+    <span>Billing</span>
+  </a>
+  <a class="nav-item" onclick="showPage('account',this)">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Account</span>
+  </a>
+  <div class="sidebar-bottom">
+    <div class="user-chip">
+      <div class="user-av">JM</div>
+      <div class="user-info">
+        <div class="user-name">Jane Mitchell</div>
+        <div class="user-plan">Pro · Active</div>
+      </div>
+      <div class="sign-out" title="Sign out">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Upload Statements</div>
+    <div class="topbar-right">
+      <div class="usage-pill" id="usage-pill">47 / 100 pages used this week</div>
+    </div>
+  </div>
+
+  <div class="page-content">
+
+    <!-- UPLOAD PAGE -->
+    <div class="dash-page active" id="page-upload">
+      <div class="stat-row">
+        <div class="stat-card"><div class="stat-label">Files Processed</div><div class="stat-val">12</div><div class="stat-sub">All time</div></div>
+        <div class="stat-card"><div class="stat-label">Transactions Found</div><div class="stat-val">341</div><div class="stat-sub">Across all uploads</div></div>
+        <div class="stat-card"><div class="stat-label">Pages This Week</div><div class="stat-val">47</div><div class="stat-sub warn">53 remaining</div></div>
+        <div class="stat-card"><div class="stat-label">Subscription</div><div class="stat-val" style="font-size:1.1rem;margin-top:4px;">✅ Active</div><div class="stat-sub">Renews Mar 23</div></div>
+      </div>
+
+      <div class="upload-section">
+        <div class="upload-section-header">
+          <h3>Upload a Chime Statement</h3>
+          <div class="free-note" id="free-note" style="display:none;"><strong>Free account:</strong> 1 page · max 100KB</div>
+        </div>
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="handleDrop(event)">
+          <div class="drop-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+          <h4>Drop your Chime PDF here</h4>
+          <p>or click to browse your files<br/>PDF files only · Chime bank statements</p>
+          <div class="drop-limit">🔒 Uploaded over encrypted HTTPS · SOC 2 infrastructure</div>
+        </div>
+        <input type="file" class="hidden-input" id="fileInput" accept=".pdf" onchange="handleFile(this.files[0])"/>
+        <div class="progress-wrap" id="progressWrap">
+          <div class="progress-file">
+            <div class="progress-file-icon">📄</div>
+            <div class="progress-info">
+              <div class="progress-name" id="progressName">statement.pdf</div>
+              <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+              <div class="progress-status" id="progressStatus">Uploading…</div>
+            </div>
+            <span class="progress-cancel" onclick="cancelUpload()">Cancel</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header"><h3>Recent Uploads</h3></div>
+        <table>
+          <thead><tr><th>File</th><th>Date</th><th>Pages</th><th>Transactions</th><th>Status</th><th></th></tr></thead>
+          <tbody id="uploadsTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TRANSACTIONS PAGE -->
+    <div class="dash-page" id="page-transactions">
+      <div class="filters">
+        <input class="filter-input" id="searchInput" placeholder="Search merchant…" oninput="filterTx()" style="width:200px;"/>
+        <select class="filter-input" id="uploadFilter" onchange="filterTx()">
+          <option value="">All uploads</option>
+          <option value="jan">January 2025</option>
+          <option value="dec">December 2024</option>
+          <option value="nov">November 2024</option>
+        </select>
+        <select class="filter-input" id="typeFilter" onchange="filterTx()">
+          <option value="">All transactions</option>
+          <option value="pos">Credits only</option>
+          <option value="neg">Debits only</option>
+        </select>
+        <span class="filter-clear" onclick="clearFilters()">Clear filters</span>
+        <div style="margin-left:auto;font-size:.8rem;color:var(--ink3);" id="txCount"></div>
+      </div>
+      <div class="table-card">
+        <table>
+          <thead><tr><th>Date</th><th>Merchant</th><th>Amount</th><th>Balance</th></tr></thead>
+          <tbody id="txTable"></tbody>
+        </table>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+
+    <!-- VISUALIZATIONS -->
+    <div class="dash-page" id="page-visualizations">
+      <div class="empty">
+        <div class="empty-icon">📊</div>
+        <h4>Visualizations coming next</h4>
+        <p>Charts, alluvial flows, and spending breakdowns will live here.</p>
+      </div>
+    </div>
+
+    <!-- EXPORTS -->
+    <div class="dash-page" id="page-exports">
+      <div class="empty">
+        <div class="empty-icon">📤</div>
+        <h4>Export center coming next</h4>
+        <p>Download your data as Excel, CSV, JSON, or PDF.</p>
+      </div>
+    </div>
+
+    <!-- EXCEL TIPS -->
+    <div class="dash-page" id="page-excel">
+      <div class="empty">
+        <div class="empty-icon">📗</div>
+        <h4>Excel tips coming next</h4>
+        <p>Formula library for exploring your exported data.</p>
+      </div>
+    </div>
+
+    <!-- BILLING PAGE -->
+    <div class="dash-page" id="page-billing">
+      <div class="billing-grid">
+        <div class="billing-card">
+          <h3>Current Plan</h3>
+          <div class="plan-name">Squealer Pro</div>
+          <div class="plan-price">$10.00 / month</div>
+          <div class="plan-status">● Active</div>
+          <div class="billing-actions">
+            <button class="btn-outline">Update payment method</button>
+            <button class="btn-danger">Cancel subscription</button>
+          </div>
+        </div>
+        <div class="billing-card">
+          <h3>Weekly Page Usage</h3>
+          <div style="font-size:1.6rem;font-weight:800;color:var(--ink);margin-bottom:4px;">47 <span style="font-size:1rem;font-weight:500;color:var(--ink3);">/ 100 pages</span></div>
+          <div class="usage-bar-wrap"><div class="usage-bar" style="width:47%"></div></div>
+          <div style="font-size:.78rem;color:var(--ink3);">Resets every 7 days · 53 pages remaining</div>
+          <div style="margin-top:16px;font-size:.82rem;color:var(--ink2);line-height:1.6;">Each Chime monthly statement is typically 10–25 pages. Your weekly allowance covers multiple months of statements.</div>
+        </div>
+      </div>
+      <div class="billing-card" style="background:var(--white);border-radius:16px;padding:28px;border:1px solid rgba(45,138,82,.08);">
+        <h3 style="font-size:.85rem;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;">Billing History</h3>
+        <div class="invoice-row"><span>Feb 23, 2025</span><span class="inv-date">Pro · 1 month</span><span class="inv-amt">$10.00</span><a class="inv-dl">Download</a></div>
+        <div class="invoice-row"><span>Jan 23, 2025</span><span class="inv-date">Pro · 1 month</span><span class="inv-amt">$10.00</span><a class="inv-dl">Download</a></div>
+        <div class="invoice-row"><span>Dec 23, 2024</span><span class="inv-date">Pro · 1 month</span><span class="inv-amt">$10.00</span><a class="inv-dl">Download</a></div>
+      </div>
+    </div>
+
+    <!-- ACCOUNT PAGE -->
+    <div class="dash-page" id="page-account">
+      <div class="account-grid">
+        <div class="account-card">
+          <h3>Profile</h3>
+          <div class="form-group"><label>Full name</label><input type="text" value="Jane Mitchell"/></div>
+          <div class="form-group"><label>Email address</label><input type="email" value="jane@email.com"/></div>
+          <button class="save-btn" onclick="toast('Profile updated')">Save changes</button>
+        </div>
+        <div class="account-card">
+          <h3>Change Password</h3>
+          <div class="form-group"><label>Current password</label><input type="password" placeholder="••••••••"/></div>
+          <div class="form-group"><label>New password</label><input type="password" placeholder="••••••••"/></div>
+          <div class="form-group"><label>Confirm new password</label><input type="password" placeholder="••••••••"/></div>
+          <button class="save-btn" onclick="toast('Password updated')">Update password</button>
+        </div>
+      </div>
+      <div class="danger-zone">
+        <h3>Delete Account</h3>
+        <p>Permanently delete your account and all associated transaction data. This action cannot be undone. Your subscription will be cancelled immediately and you will not be refunded for the current billing period.</p>
+        <button class="btn-danger">Delete my account</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Page routing ──────────────────────────────────────────────────────────────
+const titles={upload:'Upload Statements',transactions:'Transactions',visualizations:'Visualizations',exports:'Export Data',excel:'Excel Tips',billing:'Billing',account:'Account Settings'};
+function showPage(name,el){
+  document.querySelectorAll('.dash-page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(el) el.classList.add('active');
+  document.getElementById('topbar-title').textContent=titles[name]||name;
+}
+
+// ── Sample data ───────────────────────────────────────────────────────────────
+const uploads=[
+  {file:'chime_jan2025.pdf',date:'Feb 18, 2025',pages:18,txns:67,status:'complete'},
+  {file:'chime_dec2024.pdf',date:'Feb 10, 2025',pages:15,txns:54,status:'complete'},
+  {file:'chime_nov2024.pdf',date:'Jan 28, 2025',pages:14,txns:61,status:'complete'},
+];
+
+const txData=[
+  {date:'Jan 28','merchant':'Walmart',amount:-84.32,balance:412.18},
+  {date:'Jan 27','merchant':'Direct Deposit',amount:1200.00,balance:496.50},
+  {date:'Jan 25','merchant':'Shell Gas',amount:-48.00,balance:-703.50},
+  {date:'Jan 24','merchant':'McDonald\'s',amount:-12.47,balance:-655.50},
+  {date:'Jan 22','merchant':'Netflix',amount:-15.49,balance:-643.03},
+  {date:'Jan 20','merchant':'Amazon',amount:-67.99,balance:-627.54},
+  {date:'Jan 18','merchant':'Uber Eats',amount:-34.22,balance:-559.55},
+  {date:'Jan 15','merchant':'CVS Pharmacy',amount:-22.14,balance:-525.33},
+  {date:'Jan 14','merchant':'Chime Transfer',amount:250.00,balance:-503.19},
+  {date:'Jan 12','merchant':'Dollar General',amount:-18.76,balance:-753.19},
+  {date:'Jan 10','merchant':'Circle K',amount:-41.00,balance:-734.43},
+  {date:'Jan 8','merchant':'Target',amount:-93.41,balance:-693.43},
+  {date:'Jan 6','merchant':'Walgreens',amount:-29.00,balance:-600.02},
+  {date:'Jan 4','merchant':'Spotify',amount:-9.99,balance:-571.02},
+  {date:'Jan 2','merchant':'PayPal Transfer',amount:75.00,balance:-561.03},
+];
+
+// Render uploads table
+const ut=document.getElementById('uploadsTable');
+uploads.forEach(u=>{
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td>📄 ${u.file}</td><td>${u.date}</td><td>${u.pages}</td><td>${u.txns}</td>
+    <td><span class="status-badge ${u.status}"><span class="status-dot"></span>${u.status.charAt(0).toUpperCase()+u.status.slice(1)}</span></td>
+    <td><button class="tbl-btn" onclick="showPage('transactions',document.querySelector('[onclick*=transactions]'))">View</button></td>`;
+  ut.appendChild(tr);
+});
+
+// ── Transactions ──────────────────────────────────────────────────────────────
+let filteredTx=[...txData];
+let currentPage=1;
+const perPage=10;
+
+function renderTx(){
+  const tbody=document.getElementById('txTable');
+  const start=(currentPage-1)*perPage;
+  const slice=filteredTx.slice(start,start+perPage);
+  tbody.innerHTML=slice.map(t=>`
+    <tr>
+      <td>${t.date}, 2025</td>
+      <td>${t.merchant}</td>
+      <td class="${t.amount<0?'amount-neg':'amount-pos'}">${t.amount<0?'-':'+'} $${Math.abs(t.amount).toFixed(2)}</td>
+      <td style="color:var(--ink3)">$${t.balance.toFixed(2)}</td>
+    </tr>`).join('');
+  document.getElementById('txCount').textContent=`${filteredTx.length} transaction${filteredTx.length!==1?'s':''}`;
+  renderPagination();
+}
+
+function renderPagination(){
+  const total=Math.ceil(filteredTx.length/perPage);
+  const p=document.getElementById('pagination');
+  if(total<=1){p.innerHTML='';return;}
+  let html=`<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+  for(let i=1;i<=total;i++) html+=`<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+  html+=`<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===total?'disabled':''}>›</button>`;
+  html+=`<span class="page-info">Page ${currentPage} of ${total}</span>`;
+  p.innerHTML=html;
+}
+
+function goPage(n){currentPage=n;renderTx();}
+
+function filterTx(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const type=document.getElementById('typeFilter').value;
+  filteredTx=txData.filter(t=>{
+    const matchQ=!q||t.merchant.toLowerCase().includes(q);
+    const matchType=!type||(type==='pos'&&t.amount>0)||(type==='neg'&&t.amount<0);
+    return matchQ&&matchType;
+  });
+  currentPage=1;
+  renderTx();
+}
+
+function clearFilters(){
+  document.getElementById('searchInput').value='';
+  document.getElementById('typeFilter').value='';
+  document.getElementById('uploadFilter').value='';
+  filteredTx=[...txData];currentPage=1;renderTx();
+}
+
+renderTx();
+
+// ── Upload simulation ─────────────────────────────────────────────────────────
+function dragOver(e){e.preventDefault();document.getElementById('dropZone').classList.add('dragover');}
+function dragLeave(){document.getElementById('dropZone').classList.remove('dragover');}
+function handleDrop(e){e.preventDefault();dragLeave();const f=e.dataTransfer.files[0];if(f)handleFile(f);}
+
+function handleFile(file){
+  if(!file||file.type!=='application/pdf'){toast('Please upload a PDF file.');return;}
+  const pw=document.getElementById('progressWrap');
+  const bar=document.getElementById('progressBar');
+  const status=document.getElementById('progressStatus');
+  document.getElementById('progressName').textContent=file.name;
+  pw.style.display='block';bar.style.width='0%';
+
+  const steps=[
+    {w:'15%',s:'Uploading…',t:400},
+    {w:'40%',s:'Uploading…',t:800},
+    {w:'65%',s:'Processing with OCR…',t:1400},
+    {w:'85%',s:'Extracting transactions…',t:900},
+    {w:'100%',s:'Complete — 54 transactions found',t:600},
+  ];
+  let delay=0;
+  steps.forEach(step=>{
+    delay+=step.t;
+    setTimeout(()=>{bar.style.width=step.w;status.textContent=step.s;},delay);
+  });
+  setTimeout(()=>{
+    pw.style.display='none';bar.style.width='0%';
+    toast('Upload complete — 54 transactions extracted');
+  },delay+800);
+}
+
+function cancelUpload(){
+  document.getElementById('progressWrap').style.display='none';
+  document.getElementById('progressBar').style.width='0%';
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>

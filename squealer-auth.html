@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Squealer – Account</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --g1:#0d4425;--g2:#1a6b3a;--g3:#2d8a52;--g4:#3fab68;--g5:#8ed4aa;
+  --gl:#eaf5ef;--gxl:#f5fbf7;
+  --ink:#0c1e12;--ink2:#3d5444;--ink3:#849e8b;
+  --err:#c0392b;--err-bg:#fdf0ee;
+  --white:#fff;
+}
+body{font-family:'Inter',sans-serif;color:var(--ink);background:var(--gxl);min-height:100vh;display:flex;flex-direction:column;}
+
+/* NAV */
+nav{padding:0 48px;height:64px;display:flex;align-items:center;justify-content:space-between;background:var(--white);border-bottom:1px solid rgba(45,138,82,.08);}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logomark{width:30px;height:30px;background:linear-gradient(135deg,var(--g1),var(--g4));border-radius:8px;display:grid;place-items:center;}
+.logomark svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;}
+.logotype{font-size:1.1rem;font-weight:800;color:var(--ink);letter-spacing:-.3px;}
+.nav-right{font-size:.85rem;color:var(--ink3);}
+.nav-right a{color:var(--g2);font-weight:600;text-decoration:none;}
+.nav-right a:hover{text-decoration:underline;}
+
+/* LAYOUT */
+.auth-wrap{flex:1;display:flex;}
+.auth-left{flex:1;display:flex;align-items:center;justify-content:center;padding:60px 48px;}
+.auth-right{width:420px;background:linear-gradient(160deg,var(--g1),var(--g2));display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 48px;position:relative;overflow:hidden;}
+.auth-right::before{content:'';position:absolute;top:-120px;right:-120px;width:340px;height:340px;background:rgba(255,255,255,.04);border-radius:50%;}
+.auth-right::after{content:'';position:absolute;bottom:-80px;left:-80px;width:260px;height:260px;background:rgba(255,255,255,.03);border-radius:50%;}
+
+/* FORM CARD */
+.auth-card{background:var(--white);border-radius:20px;padding:44px;width:100%;max-width:440px;box-shadow:0 8px 48px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.04);}
+.auth-card h2{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--ink);margin-bottom:6px;}
+.auth-card .subtitle{font-size:.9rem;color:var(--ink3);margin-bottom:32px;line-height:1.5;}
+.auth-card .subtitle strong{color:var(--g2);}
+
+/* FORM */
+.form-group{margin-bottom:18px;}
+.form-group label{display:block;font-size:.78rem;font-weight:700;color:var(--ink2);margin-bottom:7px;text-transform:uppercase;letter-spacing:.04em;}
+.form-group input{width:100%;padding:12px 14px;border:1.5px solid #d4e4d8;border-radius:10px;font-size:.93rem;font-family:inherit;color:var(--ink);background:#fff;transition:.2s;outline:none;}
+.form-group input:focus{border-color:var(--g3);box-shadow:0 0 0 3px rgba(45,138,82,.1);}
+.form-group input.error{border-color:var(--err);box-shadow:0 0 0 3px rgba(192,57,43,.08);}
+.form-group .err-msg{font-size:.78rem;color:var(--err);margin-top:5px;display:none;}
+.form-group input.error + .err-msg{display:block;}
+.input-wrap{position:relative;}
+.input-wrap input{padding-right:42px;}
+.toggle-pw{position:absolute;right:13px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--ink3);padding:4px;display:flex;}
+.toggle-pw svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+.divider{display:flex;align-items:center;gap:12px;margin:22px 0;}
+.divider span{font-size:.78rem;color:var(--ink3);white-space:nowrap;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:#e8ede9;}
+
+.btn{width:100%;padding:13px;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:.2s;line-height:1;}
+.btn-primary{background:var(--g2);color:#fff;box-shadow:0 2px 14px rgba(26,107,58,.25);}
+.btn-primary:hover{background:var(--g1);box-shadow:0 4px 20px rgba(26,107,58,.35);}
+.btn-primary:active{transform:scale(.99);}
+.btn-primary:disabled{background:#a0c4ac;cursor:not-allowed;box-shadow:none;}
+
+.auth-switch{text-align:center;font-size:.87rem;color:var(--ink3);margin-top:22px;}
+.auth-switch a{color:var(--g2);font-weight:600;text-decoration:none;cursor:pointer;}
+.auth-switch a:hover{text-decoration:underline;}
+
+.terms-note{font-size:.75rem;color:var(--ink3);text-align:center;margin-top:16px;line-height:1.6;}
+.terms-note a{color:var(--g3);text-decoration:none;}
+.terms-note a:hover{text-decoration:underline;}
+
+/* FREE TIER BADGE */
+.free-badge{background:var(--gl);border:1px solid rgba(45,138,82,.18);border-radius:12px;padding:14px 18px;margin-bottom:28px;display:flex;align-items:flex-start;gap:12px;}
+.free-badge-icon{font-size:1.2rem;flex-shrink:0;margin-top:2px;}
+.free-badge p{font-size:.83rem;color:var(--ink2);line-height:1.55;}
+.free-badge p strong{color:var(--g2);}
+
+/* PASSWORD STRENGTH */
+.pw-strength{margin-top:8px;}
+.pw-bars{display:flex;gap:4px;margin-bottom:5px;}
+.pw-bar{flex:1;height:3px;border-radius:2px;background:#e8ede9;transition:.3s;}
+.pw-bar.weak{background:#e74c3c;}
+.pw-bar.fair{background:#f39c12;}
+.pw-bar.good{background:var(--g4);}
+.pw-bar.strong{background:var(--g2);}
+.pw-label{font-size:.72rem;color:var(--ink3);}
+
+/* RIGHT PANEL */
+.right-quote{position:relative;z-index:1;text-align:center;}
+.right-quote .ql{font-size:3rem;color:rgba(255,255,255,.2);font-family:'Playfair Display',serif;line-height:1;margin-bottom:8px;}
+.right-quote p{font-size:1.05rem;color:rgba(255,255,255,.9);font-style:italic;line-height:1.65;margin-bottom:24px;font-family:'Playfair Display',serif;}
+.right-stats{display:flex;flex-direction:column;gap:14px;width:100%;margin-top:40px;}
+.right-stat{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:14px;}
+.right-stat-icon{font-size:1.2rem;}
+.right-stat-text strong{display:block;font-size:.95rem;font-weight:700;color:#fff;}
+.right-stat-text span{font-size:.78rem;color:rgba(255,255,255,.5);}
+
+/* SUCCESS STATE */
+.success-state{display:none;text-align:center;padding:20px 0;}
+.success-icon{width:64px;height:64px;background:var(--gl);border-radius:50%;display:grid;place-items:center;margin:0 auto 20px;}
+.success-icon svg{width:32px;height:32px;stroke:var(--g2);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.success-state h3{font-size:1.4rem;font-weight:800;color:var(--ink);margin-bottom:8px;}
+.success-state p{font-size:.9rem;color:var(--ink3);line-height:1.6;}
+
+/* RESET PAGE */
+.reset-card{max-width:420px;}
+
+/* TABS */
+.page{display:none;}
+.page.active{display:flex;flex-direction:column;min-height:100vh;}
+
+/* Alert */
+.alert{border-radius:10px;padding:12px 16px;font-size:.85rem;margin-bottom:20px;display:none;align-items:center;gap:10px;}
+.alert.error{background:var(--err-bg);color:var(--err);border:1px solid rgba(192,57,43,.15);}
+.alert.show{display:flex;}
+.alert svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;flex-shrink:0;}
+
+/* Forgot pw link */
+.forgot{display:block;text-align:right;font-size:.78rem;color:var(--g3);text-decoration:none;margin-top:-10px;margin-bottom:18px;font-weight:600;}
+.forgot:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+
+<!-- ===== SIGNUP PAGE ===== -->
+<div id="page-signup" class="page active">
+  <nav>
+    <a class="logo" href="#" onclick="showPage('landing')">
+      <div class="logomark"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+      <span class="logotype">Squealer</span>
+    </a>
+    <div class="nav-right">Already have an account? <a onclick="showPage('login')">Sign in</a></div>
+  </nav>
+  <div class="auth-wrap">
+    <div class="auth-left">
+      <div class="auth-card">
+        <h2>Create your account</h2>
+        <p class="subtitle">Start with a free upload — <strong>1 page, up to 100KB, no card needed.</strong></p>
+
+        <div class="free-badge">
+          <div class="free-badge-icon">🎁</div>
+          <p>Upload one page of any Chime statement to see Squealer work on your real data before subscribing.</p>
+        </div>
+
+        <div class="alert error" id="signup-alert">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="signup-alert-msg"></span>
+        </div>
+
+        <div class="form-group">
+          <label>Full name</label>
+          <input type="text" id="su-name" placeholder="Jane Smith" oninput="clearErr('su-name')"/>
+          <div class="err-msg">Please enter your name</div>
+        </div>
+        <div class="form-group">
+          <label>Email address</label>
+          <input type="email" id="su-email" placeholder="jane@email.com" oninput="clearErr('su-email')"/>
+          <div class="err-msg">Please enter a valid email</div>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrap">
+            <input type="password" id="su-pw" placeholder="Create a password" oninput="checkStrength(this.value);clearErr('su-pw')"/>
+            <button class="toggle-pw" onclick="togglePw('su-pw',this)" type="button">
+              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="err-msg">Password must be at least 8 characters</div>
+          <div class="pw-strength" id="pw-strength" style="display:none;">
+            <div class="pw-bars">
+              <div class="pw-bar" id="pb1"></div>
+              <div class="pw-bar" id="pb2"></div>
+              <div class="pw-bar" id="pb3"></div>
+              <div class="pw-bar" id="pb4"></div>
+            </div>
+            <div class="pw-label" id="pw-label"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Confirm password</label>
+          <div class="input-wrap">
+            <input type="password" id="su-pw2" placeholder="Repeat your password" oninput="clearErr('su-pw2')"/>
+            <button class="toggle-pw" onclick="togglePw('su-pw2',this)" type="button">
+              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="err-msg">Passwords do not match</div>
+        </div>
+
+        <button class="btn btn-primary" id="signup-btn" onclick="handleSignup()">Create account</button>
+
+        <div class="terms-note">By creating an account you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</div>
+        <div class="auth-switch">Already have an account? <a onclick="showPage('login')">Sign in</a></div>
+
+        <!-- Success -->
+        <div class="success-state" id="signup-success">
+          <div class="success-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <h3>Account created!</h3>
+          <p>Check your email to verify your address, then sign in to try your free upload.</p>
+        </div>
+      </div>
+    </div>
+    <div class="auth-right">
+      <div class="right-quote">
+        <div class="ql">"</div>
+        <p>I had months of Chime statements I needed in Excel. Squealer had them all extracted in minutes.</p>
+      </div>
+      <div class="right-stats">
+        <div class="right-stat"><div class="right-stat-icon">📄</div><div class="right-stat-text"><strong>1 free page to start</strong><span>No credit card required</span></div></div>
+                  <div class="right-stat"><div class="right-stat-icon">🔒</div><div class="right-stat-text"><strong>SOC 2 certified infrastructure</strong><span>Same standard as major financial institutions</span></div></div>
+        <div class="right-stat"><div class="right-stat-icon">🗑️</div><div class="right-stat-text"><strong>Deleted after processing</strong><span>Your PDF is never retained or logged</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== LOGIN PAGE ===== -->
+<div id="page-login" class="page">
+  <nav>
+    <a class="logo" href="#" onclick="showPage('landing')">
+      <div class="logomark"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+      <span class="logotype">Squealer</span>
+    </a>
+    <div class="nav-right">No account yet? <a onclick="showPage('signup')">Sign up free</a></div>
+  </nav>
+  <div class="auth-wrap">
+    <div class="auth-left">
+      <div class="auth-card">
+        <h2>Welcome back</h2>
+        <p class="subtitle">Sign in to your Squealer account to access your dashboard.</p>
+
+        <div class="alert error" id="login-alert">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="login-alert-msg">Incorrect email or password. Please try again.</span>
+        </div>
+
+        <div class="form-group">
+          <label>Email address</label>
+          <input type="email" id="li-email" placeholder="jane@email.com" oninput="clearErr('li-email')" onkeydown="if(event.key==='Enter')handleLogin()"/>
+          <div class="err-msg">Please enter your email</div>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrap">
+            <input type="password" id="li-pw" placeholder="Your password" oninput="clearErr('li-pw')" onkeydown="if(event.key==='Enter')handleLogin()"/>
+            <button class="toggle-pw" onclick="togglePw('li-pw',this)" type="button">
+              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="err-msg">Please enter your password</div>
+        </div>
+        <a class="forgot" onclick="showPage('reset')">Forgot your password?</a>
+
+        <button class="btn btn-primary" onclick="handleLogin()">Sign in</button>
+        <div class="auth-switch">No account? <a onclick="showPage('signup')">Create one free</a></div>
+      </div>
+    </div>
+    <div class="auth-right">
+      <div class="right-quote">
+        <div class="ql">"</div>
+        <p>Finally I can see exactly where my money went each month without manually reading through PDFs.</p>
+      </div>
+      <div class="right-stats">
+        <div class="right-stat"><div class="right-stat-icon">⚡</div><div class="right-stat-text"><strong>Seconds to extract</strong><span>Any Chime PDF statement</span></div></div>
+        <div class="right-stat"><div class="right-stat-icon">📈</div><div class="right-stat-text"><strong>Visualizations included</strong><span>Alluvial, bar, 3D and more</span></div></div>
+        <div class="right-stat"><div class="right-stat-icon">💳</div><div class="right-stat-text"><strong>$10/month after free upload</strong><span>Cancel anytime</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== RESET PASSWORD PAGE ===== -->
+<div id="page-reset" class="page">
+  <nav>
+    <a class="logo" href="#" onclick="showPage('landing')">
+      <div class="logomark"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+      <span class="logotype">Squealer</span>
+    </a>
+    <div class="nav-right"><a onclick="showPage('login')">← Back to sign in</a></div>
+  </nav>
+  <div class="auth-wrap">
+    <div class="auth-left">
+      <div class="auth-card reset-card">
+        <div id="reset-form-view">
+          <h2>Reset your password</h2>
+          <p class="subtitle">Enter the email you signed up with and we'll send you a reset link.</p>
+          <div class="form-group">
+            <label>Email address</label>
+            <input type="email" id="reset-email" placeholder="jane@email.com" onkeydown="if(event.key==='Enter')handleReset()"/>
+            <div class="err-msg">Please enter your email</div>
+          </div>
+          <button class="btn btn-primary" onclick="handleReset()">Send reset link</button>
+          <div class="auth-switch"><a onclick="showPage('login')">← Back to sign in</a></div>
+        </div>
+        <div class="success-state" id="reset-success">
+          <div class="success-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+          <h3>Check your inbox</h3>
+          <p>We sent a password reset link to <strong id="reset-email-shown"></strong>. It expires in 30 minutes.</p>
+          <div style="margin-top:24px;"><a onclick="showPage('login')" style="color:var(--g2);font-size:.88rem;font-weight:600;cursor:pointer;">← Back to sign in</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="auth-right">
+      <div class="right-quote" style="position:relative;z-index:1;">
+        <div class="right-stat" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:24px;text-align:left;">
+          <p style="font-size:.85rem;color:rgba(255,255,255,.6);line-height:1.6;">Reset links are valid for <strong style="color:#fff;">30 minutes</strong> and can only be used once. If you don't see the email, check your spam folder.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showPage(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  const pg=document.getElementById('page-'+p);
+  if(pg) pg.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function togglePw(id,btn){
+  const inp=document.getElementById(id);
+  const showing=inp.type==='text';
+  inp.type=showing?'password':'text';
+  btn.querySelector('svg').innerHTML=showing
+    ?'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'
+    :'<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+}
+
+function clearErr(id){
+  const el=document.getElementById(id);
+  if(el) el.classList.remove('error');
+}
+
+function showAlert(id,msg){
+  const a=document.getElementById(id);
+  if(msg) document.getElementById(id+'-msg').textContent=msg;
+  a.classList.add('show');
+  setTimeout(()=>a.classList.remove('show'),5000);
+}
+
+function checkStrength(val){
+  const s=document.getElementById('pw-strength');
+  const bars=[document.getElementById('pb1'),document.getElementById('pb2'),document.getElementById('pb3'),document.getElementById('pb4')];
+  const lbl=document.getElementById('pw-label');
+  if(!val){s.style.display='none';return;}
+  s.style.display='block';
+  bars.forEach(b=>{b.className='pw-bar';});
+  let score=0;
+  if(val.length>=8) score++;
+  if(/[A-Z]/.test(val)) score++;
+  if(/[0-9]/.test(val)) score++;
+  if(/[^A-Za-z0-9]/.test(val)) score++;
+  const levels=['','weak','fair','good','strong'];
+  const labels=['','Weak','Fair','Good','Strong'];
+  for(let i=0;i<score;i++) bars[i].classList.add(levels[score]);
+  lbl.textContent=labels[score];
+  lbl.style.color=score<=1?'#e74c3c':score===2?'#f39c12':score===3?'var(--g4)':'var(--g2)';
+}
+
+function handleSignup(){
+  const name=document.getElementById('su-name');
+  const email=document.getElementById('su-email');
+  const pw=document.getElementById('su-pw');
+  const pw2=document.getElementById('su-pw2');
+  let valid=true;
+
+  if(!name.value.trim()){name.classList.add('error');valid=false;}
+  if(!email.value.includes('@')){email.classList.add('error');valid=false;}
+  if(pw.value.length<8){pw.classList.add('error');valid=false;}
+  if(pw.value!==pw2.value){pw2.classList.add('error');valid=false;}
+  if(!valid) return;
+
+  const btn=document.getElementById('signup-btn');
+  btn.disabled=true;btn.textContent='Creating account…';
+
+  // Simulate API call — replace with real Supabase call
+  setTimeout(()=>{
+    document.querySelector('#page-signup .auth-card > *:not(.success-state)').style.display='none';
+    document.querySelectorAll('#page-signup .auth-card > *:not(.success-state)').forEach(el=>el.style.display='none');
+    document.getElementById('signup-success').style.display='block';
+  },1400);
+}
+
+function handleLogin(){
+  const email=document.getElementById('li-email');
+  const pw=document.getElementById('li-pw');
+  let valid=true;
+  if(!email.value.includes('@')){email.classList.add('error');valid=false;}
+  if(!pw.value){pw.classList.add('error');valid=false;}
+  if(!valid) return;
+
+  // Simulate — replace with real Supabase signIn
+  // On success: window.location.href = '/dashboard'
+  // On error: showAlert('login-alert','Incorrect email or password.')
+  showAlert('login-alert','Incorrect email or password. Please try again.');
+}
+
+function handleReset(){
+  const email=document.getElementById('reset-email');
+  if(!email.value.includes('@')){email.classList.add('error');return;}
+  document.getElementById('reset-email-shown').textContent=email.value;
+  document.getElementById('reset-form-view').style.display='none';
+  document.getElementById('reset-success').style.display='block';
+}
+</script>
+</body>
+</html>
